@@ -512,7 +512,7 @@ void refstackNamed(TDirectory *fit, TDirectory *refd, TString alias, TString fit
         pref->Draw( "" );
     }
     hfit->Draw(doFillMC ? "P0Sames" : "P SAME");
-    if (datalbl) doLegend(hfit,href,datalbl,reflbl);
+    //if (datalbl) doLegend(hfit,href,datalbl,reflbl);
    
     if (doSquare) squareCanvas(pref);
     maybeLogX(pref, href); 
@@ -574,7 +574,7 @@ void refstack3(TDirectory *fit, TDirectory *refd, TDirectory *mc, TString alias,
     pref->Draw("");
     hmc->Draw("P SAME");
     hfit->Draw("P SAME");
-    if (datalbl) doLegend(hfit,href,hmc,"T&P "+datalbl,"T&P "+reflbl, "Simulation truth");
+    //if (datalbl) doLegend(hfit,href,hmc,"T&P "+datalbl,"T&P "+reflbl, "Simulation truth");
    
     if (doSquare) squareCanvas(pref);
     maybeLogX(pref, href); 
@@ -608,7 +608,7 @@ void mcstack(TDirectory *fit, TDirectory *refd, TString alias, TString name) {
     pref->Draw();
     hfit->Draw("P SAME");
 
-    doLegend(hfit,href,datalbl,reflbl);
+    //doLegend(hfit,href,datalbl,reflbl);
     maybeLogX(pref, href); 
     gPad->Print(prefix+alias+".png");
     if (doPdf) gPad->Print(prefix+alias+".pdf");

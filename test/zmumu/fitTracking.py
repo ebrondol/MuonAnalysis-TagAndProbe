@@ -53,15 +53,20 @@ ETA3_BINS = cms.PSet(CONSTRAINTS,
 )
 
 ETA_PHI_BINS = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 20, 120 ),
-    eta = cms.vdouble(-2.4,-1.9,1.9,2.4),
-    phi = cms.vdouble(*[-3.14+6.28*x/8 for x in range(0,9)]),
+    pt = cms.vdouble( 10, 120 ),
+#    phi = cms.vdouble(*[-3.14+6.28*x/8 for x in range(0,9)]),
+    phi = cms.vdouble(-3.14, -2.5, -2, -1.25, -0.63, 0, 0.63, 1.25, 2., 2.5, 3.14),
+    eta = cms.vdouble(-2.4,0,2.4)
 )
 
 VTX_BINS = ONE_BIN.clone(
     tag_nVertices = cms.vdouble(*[2*i+0.5 for i in xrange(15)])
 )
-VTX_BINS.tag_nVertices += [30.5, 35.5]
+#VTX_BINS.tag_nVertices += [30.5, 35.5]
+
+PHI_BINS = ONE_BIN.clone(
+    phi = cms.vdouble(-3.14, -2.5, -2, -1.25, -0.63, 0, 0.63, 1.25, 2., 2.5, 3.14)
+)
 
 RUN_BINS_ALL = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 10, 120 ),
@@ -149,8 +154,8 @@ process.TnP_Tracking = Template.clone(
     Efficiencies = cms.PSet()
 )
 
-if "74X" in scenario:
-    process.TnP_Tracking.InputFileNames = [ "tnpZ_tracking_74X.root" ]
+if "TestData_" in scenario:
+    process.TnP_Tracking.InputFileNames = [ "tnpZ_Data_%s.root" % ("_".join(scenario.replace("TestData_","").split("_")[:-1]),) ]
 if "TestMC_" in scenario:
     process.TnP_Tracking.InputFileNames = [ "tnpZ_MC_%s.root" % ("_".join(scenario.replace("TestMC_","").split("_")[:-1]),) ]
 if "TestMCGen_" in scenario:
@@ -192,6 +197,7 @@ for (dr,de) in matches:
         if "et2" in scenario: setattr(module.Efficiencies, "eff_eta2_"+label, cms.PSet(common, BinnedVariables = ETA2_BINS))
         if "et3" in scenario: setattr(module.Efficiencies, "eff_eta3_"+label, cms.PSet(common, BinnedVariables = ETA3_BINS))
         if "vtx" in scenario: setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
+        if "phi" in scenario: setattr(module.Efficiencies, "eff_phi_"+label, cms.PSet(common, BinnedVariables = PHI_BINS))
         if "two" in scenario: setattr(module.Efficiencies, "eff_two_"+label, cms.PSet(common, BinnedVariables = TWO_BINS))
         if "eph" in scenario: setattr(module.Efficiencies, "eff_eph_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
         if "run" in scenario: setattr(module.Efficiencies, "eff_run_"+label, cms.PSet(common, BinnedVariables = RUN_BINS_ALL))
