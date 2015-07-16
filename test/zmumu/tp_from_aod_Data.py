@@ -1,7 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
 import subprocess
-#dataSummary = open('dataSummary.txt', 'w')
 
 process = cms.Process("TagProbe")
 
@@ -30,21 +29,20 @@ if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
     process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
 
     #run 251244
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/244/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
+#    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/244/00000"
+#    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+#    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
 
     #run 251251
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/251/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
+#    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/251/00000"
+#    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+#    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
 
     #run 251252
-    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/252/00000"
-    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
-    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
+#    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/252/00000"
+#    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+#    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
 
-    # to add following runs: 251491, 251493, 251496, ..., 251500 
     print process.source.fileNames
     #print process.source.fileNames, dataSummary
 
@@ -535,4 +533,4 @@ if TRIGGER == "SingleMu":
        process.fakeRateZPlusProbe,
     ])
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data_PromptReco.root"))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data_PromptReco_251168.root"))

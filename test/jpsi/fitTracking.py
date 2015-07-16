@@ -6,9 +6,9 @@ if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
 scenario = "data_all"
 if len(args) > 0: scenario = args[0]
 print "Will run scenario ", scenario 
-doEta = True
+doEta = False
 doIchep = True
-doVtx = True
+doVtx = False
 
 CONSTRAINTS = cms.PSet(
     outerValidHits = cms.vstring("pass"),
@@ -128,6 +128,11 @@ elif scenario == "beauty_mc":
     process.TnP_Tracking.InputFileNames = [
         PREFIX+"tnpJPsi_MC_Bp.root",
     ]
+if "TestData_" in scenario:
+    process.TnP_Tracking.InputFileNames = [ "tnpJPsi_Data_%s.root" % ("_".join(scenario.replace("TestData_","").split("_")[:-1]),) ]
+if "TestMC_" in scenario:
+    process.TnP_Tracking.InputFileNames = [ "tnpJPsi_MC_%s.root" % ("_".join(scenario.replace("TestMC_","").split("_")[:-1]),) ]
+
 
 
 sampleToPdfMap = { "": "gaussPlusCubic", "NoJPsi":"gaussPlusFloatCubic", "NoBestJPsi":"gaussPlusFloatCubic"}

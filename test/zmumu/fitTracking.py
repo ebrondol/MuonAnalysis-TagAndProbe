@@ -56,7 +56,7 @@ ETA_PHI_BINS = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 10, 120 ),
 #    phi = cms.vdouble(*[-3.14+6.28*x/8 for x in range(0,9)]),
     phi = cms.vdouble(-3.14, -2.5, -2, -1.25, -0.63, 0, 0.63, 1.25, 2., 2.5, 3.14),
-    eta = cms.vdouble(-2.4,0,2.4)
+    eta = cms.vdouble(-2.4,0.,2.4)
 )
 
 VTX_BINS = ONE_BIN.clone(

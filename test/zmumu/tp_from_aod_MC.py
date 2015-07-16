@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+import subprocess
+
 process = cms.Process("TagProbe")
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -19,17 +21,11 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V7')
-    process.source.fileNames = [
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0CE0AB97-2E1A-E511-A324-0025905A607E.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0E3FF274-2C1A-E511-9FC5-0025905A60D2.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/68042E12-471B-E511-B16E-0025905A60B4.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/860D8B15-251A-E511-B97A-0025905A612C.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/8A3792A9-141B-E511-8931-0025905A6084.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/A2D65BC4-141B-E511-8A1A-002618943875.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/B4DFF255-4A1A-E511-81FA-0025905A48E4.root',
-        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/B6B36157-4A1A-E511-9FFA-003048FF86CA.root'
-    ]
+    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V8')
+    sourcefilesfolder = "/store/relval/CMSSW_7_4_6_patch6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch_noCCC-v1/00000";
+    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+    process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
+    print process.source.fileNames
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON

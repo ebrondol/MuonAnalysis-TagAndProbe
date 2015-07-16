@@ -5,12 +5,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
@@ -38,7 +38,19 @@ elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
     from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
     process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')
     process.source.fileNames = [
-        'file:data2015/RelValBoostedJPsi_7_3_0_pre1/Reference_PU35/RECO_1.root',
+#        'file:data2015/RelValBoostedJPsi_7_3_0_pre1/Reference_PU35/RECO_1.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/183C894F-C008-E511-AFB5-0025905A606A.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/3615E328-D708-E511-B2F9-003048FFD752.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/561562A2-D708-E511-B06E-0025905B8576.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/6E145BC4-D708-E511-99CF-002481E94BCA.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/7E81F237-C808-E511-90F4-00261894383E.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/60000/888136A8-D708-E511-823C-002590A2CD68.root',
+       'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/70000/08135FA6-6E0C-E511-9A97-002618943948.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/70000/283882C6-860C-E511-AB1C-0026189438C9.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/70000/76BD42C8-FE08-E511-BAB9-0025905A60DE.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/70000/9AA472CE-FE08-E511-BEE3-0025905B8582.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/70000/C81001CF-860C-E511-A5B7-0025905A6088.root',
+        'root://cms-xrd-global.cern.ch///store/mc/RunIISpring15DR74/JpsiToMuMu_JPsiPt7_13TeV-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/70000/F87F150E-710C-E511-9F33-0025905A60BC.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -227,7 +239,7 @@ process.tnpSimpleSequence = cms.Sequence(
 
 process.tagAndProbe = cms.Path( 
     process.fastFilter +
-    #process.HLTBoth    +
+    process.HLTBoth    +
     process.mergedMuons                 *
     process.patMuonsWithTriggerSequence *
     process.tnpSimpleSequence
@@ -317,7 +329,13 @@ process.RandomNumberGeneratorService.tkTracksNoJPsi      = cms.PSet( initialSeed
 process.RandomNumberGeneratorService.tkTracksNoBestJPsi  = cms.PSet( initialSeed = cms.untracked.uint32(81) )
 
 if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
-    process.pCutTracks0 = process.pCutTracks.clone(src = 'earlyGeneralTracks')
+    process.tracksNoMuonSeeded = cms.EDFilter("TrackSelector",
+      src = cms.InputTag("generalTracks"),
+      cut = cms.string(" || ".join("isAlgoInMask('%s')" % a for a in [
+                    'initialStep', 'lowPtTripletStep', 'pixelPairStep', 'detachedTripletStep',
+                    'mixedTripletStep', 'pixelLessStep', 'tobTecStep', 'jetCoreRegionalStep' ] ) )
+    )
+    process.pCutTracks0 = process.pCutTracks.clone(src = 'tracksNoMuonSeeded')
     process.tkTracks0 = process.tkTracks.clone(src = 'pCutTracks0')
     process.tkTracksNoJPsi0 = process.tkTracksNoJPsi.clone(src = 'tkTracks0')
     process.tkTracksNoBestJPsi0 = process.tkTracksNoBestJPsi.clone(src = 'tkTracks0')
@@ -325,7 +343,7 @@ if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
     process.RandomNumberGeneratorService.tkTracksNoBestJPsi0  = cms.PSet( initialSeed = cms.untracked.uint32(81) )
     process.preTkMatchSequenceJPsi.replace(
             process.tkTracksNoJPsi, process.tkTracksNoJPsi +
-            process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoJPsi0 +process.tkTracksNoBestJPsi0
+            process.tracksNoMuonSeeded + process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoJPsi0 +process.tkTracksNoBestJPsi0
     )
     process.staToTkMatch0 = process.staToTkMatch.clone(matched = 'tkTracks0')
     process.staToTkMatchNoJPsi0 = process.staToTkMatchNoJPsi.clone(matched = 'tkTracksNoJPsi0')
@@ -342,7 +360,7 @@ if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
 
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +
-#    process.HLTMu      +
+    process.HLTBoth      +
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta
@@ -407,6 +425,7 @@ if True: # turn on for tracking efficiency using gen particles as probe
     )
     process.tagAndProbeTkGen = cms.Path(
         process.fastFilter +
+        process.HLTMu + 
         process.probeGen +
         process.tpPairsTkGen +
         process.preTkMatchSequenceJPsi +
@@ -471,6 +490,7 @@ if True: # turn on for tracking efficiency using L1 seeds
     )
     process.tagAndProbeTkL1 = cms.Path(
         process.fastFilter +
+        process.HLTMu + 
         process.probeL1 +
         process.tpPairsTkL1 +
         process.preTkMatchSequenceJPsi +
@@ -482,76 +502,14 @@ if True: # turn on for tracking efficiency using L1 seeds
         process.tpTreeL1
     )
 
-##    _____     _          ____       _            
-##   |  ___|_ _| | _____  |  _ \ __ _| |_ ___  ___ 
-##   | |_ / _` | |/ / _ \ | |_) / _` | __/ _ \/ __|
-##   |  _| (_| |   <  __/ |  _ < (_| | ||  __/\__ \
-##   |_|  \__,_|_|\_\___| |_| \_\__,_|\__\___||___/
-##                                                 
-##   
-#process.load("MuonAnalysis.TagAndProbe.fakerate_all_cff")
-#
-#process.fakeRateJetPlusProbeTree = process.tpTree.clone(
-#    tagProbePairs = 'jetPlusProbe',
-#    arbitration   = 'None',
-#    tagVariables = process.JetPlusProbeTagVariables,
-#    tagFlags = cms.PSet(),
-#    pairVariables = cms.PSet(deltaPhi = cms.string("deltaPhi(daughter(0).phi, daughter(1).phi)")),
-#    pairFlags     = cms.PSet(),
-#    isMC = False, # MC matches not in place for FR yet
-#)
-#process.fakeRateWPlusProbeTree = process.tpTree.clone(
-#    tagProbePairs = 'wPlusProbe',
-#    arbitration   = 'None',
-#    tagVariables = process.WPlusProbeTagVariables,
-#    tagFlags = cms.PSet(),
-#    pairVariables = cms.PSet(),
-#    pairFlags     = cms.PSet(SameSign = cms.string('daughter(0).daughter(0).charge == daughter(1).charge')),
-#    isMC = False, # MC matches not in place for FR yet
-#)
-#process.fakeRateZPlusProbeTree = process.tpTree.clone(
-#    tagProbePairs = 'zPlusProbe',
-#    arbitration   = 'None',
-#    tagVariables  = process.ZPlusProbeTagVariables,
-#    tagFlags      = cms.PSet(),
-#    pairVariables = cms.PSet(),
-#    pairFlags     = cms.PSet(),
-#    isMC = False, # MC matches not in place for FR yet
-#)
-#
-#process.fakeRateJetPlusProbe = cms.Path(
-#    process.fastFilter +
-#    process.mergedMuons * process.patMuonsWithTriggerSequence +
-#    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
-#    process.jetPlusProbeSequence +
-#    process.fakeRateJetPlusProbeTree
-#)
-#process.fakeRateWPlusProbe = cms.Path(
-#    process.fastFilter +
-#    process.mergedMuons * process.patMuonsWithTriggerSequence +
-#    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
-#    process.wPlusProbeSequence +
-#    process.fakeRateWPlusProbeTree
-#)
-#process.fakeRateZPlusProbe = cms.Path(
-#    process.fastFilter +
-#    process.mergedMuons * process.patMuonsWithTriggerSequence +
-#    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
-#    process.zPlusProbeSequence +
-#    process.fakeRateZPlusProbeTree
-#)
-
 process.schedule = cms.Schedule(
    process.tagAndProbe,
    process.tagAndProbeSta,
    process.tagAndProbeTkGen,
    process.tagAndProbeTkL1,
-   #process.fakeRateJetPlusProbe,
-   #process.fakeRateWPlusProbe,
-   #process.fakeRateZPlusProbe,
 )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_MC_prova.root"))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_MC.root"))
 
 # use this if you want to compute also 'unbiased' efficiencies, 
 # - you have to remove all filters
