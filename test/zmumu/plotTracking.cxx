@@ -90,12 +90,12 @@ void plotTracking(TString scenario="data",bool DataVsMCcomparison = false, TStri
 }
 
 void plotTracking_(TString match) {
-    const int nplots = 12;
-    const char *plots[nplots] = { "eff_aeta",    "eff_1",    "efft_1",    "eff_eta",  "eff_eta2", "eff_eta3",  "eff",       "eff_vtx",             "eff_two", 	"eff_phi", 	"eff_eph", 	"eff_eph"};
-    const char * vars[nplots] = { "abseta",      "eta",      "eta",       "eta",      "eta",      "eta",       "eta",       "tag_nVertices",       "abseta", 	"phi",		 "phi", 	"phi"};
-    const char *xvars[nplots] = { "muon |#eta|", "muon #eta","muon #eta", "muon #eta","muon #eta","muon #eta", "muon #eta", "N(primary vertices)", "muon |#eta|", "muon #phi" ,	"muon #phi", 	"muon #phi"};
-    const char *bincs[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"",		"eta_bin0", 	"eta_bin1"}; 
-    const char *binls[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"", 		"#eta < 0", 	"#eta > 0"};
+    const int nplots = 13;
+    const char *plots[nplots] = { "eff_aeta",    "eff_1",    "efft_1",    "eff_eta",  "eff_eta2", "eff_eta3",  "eff",       "eff_vtx",             "eff_two", 	"eff_phi", 	"eff_eph", 	"eff_eph", 	"eff_eph"};
+    const char * vars[nplots] = { "abseta",      "eta",      "eta",       "eta",      "eta",      "eta",       "eta",       "tag_nVertices",       "abseta", 	"phi",		 "phi", 	"phi", 		"phi"};
+    const char *xvars[nplots] = { "muon |#eta|", "muon #eta","muon #eta", "muon #eta","muon #eta","muon #eta", "muon #eta", "N(primary vertices)", "muon |#eta|", "muon #phi" ,	"muon #phi", 	"muon #phi", 	"muon #phi"};
+    const char *bincs[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"",		"eta_bin0", 	"eta_bin1", 	"eta_bin2"}; 
+    const char *binls[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"", 		"#eta < -0.5", 	"-0.5 > #eta > 0.5", "#eta > 0.5"};
     bool  has10files = (gNFiles == 10);
     bool  has9files = (gNFiles == 9);
     bool  has8files = (gNFiles >= 8);
@@ -156,7 +156,7 @@ void plotTracking_(TString match) {
                 gPad->SetLeftMargin(0.2);
                 cref->Draw(doFillMC ? "AE2" : "AP");
                 corr->Draw("P SAME");
-                //if (datalbl) doLegend(corr,cref,datalbl,reflbl);
+                if (datalbl) doLegend(corr,cref,datalbl,reflbl);
                 c1->Print(prefix+plotname+binName+"_corr"+".png");
                 if (doPdf) c1->Print(prefix+plotname+binName+"_corr"+".pdf");
                 if (doTxt)  printGraph(corr,"fit_"+plotname+binName+"_corr");
@@ -198,7 +198,7 @@ void plotTracking_(TString match) {
                     cref->Draw(doFillMC ? "E2" : "P");
                     corr0->Draw("P SAME");
                     corr->Draw("P SAME");
-                    //if (datalbl) doLegend(corr,cref,datalbl,reflbl);
+                    if (datalbl) doLegend(corr,cref,datalbl,reflbl);
                     c1->Print(prefix+plotname+binName+"_corr4"+".png"); 
                     if (doPdf) c1->Print(prefix+plotname+binName+"_corr4"+".pdf");
 
@@ -231,7 +231,7 @@ void plotTracking_(TString match) {
                         cref->GetYaxis()->SetTitle("Bias-corrected eff.");
                         cref->Draw(doFillMC ? "AE2" : "AP");
                         corrBC->Draw("P SAME");
-                        //if (datalbl) doLegend(corrBC,cref,datalbl,reflbl);
+                        if (datalbl) doLegend(corrBC,cref,datalbl,reflbl);
                         c1->Print(prefix+plotname+binName+"_biascorr"+".png"); 
                         if (doPdf) c1->Print(prefix+plotname+binName+"_biascorr"+".pdf");
                         if (doTxt)  printGraph(corrBC,"fit_"+plotname+binName+"_biascorr");

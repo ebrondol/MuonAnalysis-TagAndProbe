@@ -56,7 +56,7 @@ ETA_PHI_BINS = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 10, 120 ),
 #    phi = cms.vdouble(*[-3.14+6.28*x/8 for x in range(0,9)]),
     phi = cms.vdouble(-3.14, -2.5, -2, -1.25, -0.63, 0, 0.63, 1.25, 2., 2.5, 3.14),
-    eta = cms.vdouble(-2.4,0.,2.4)
+    eta = cms.vdouble(-2.4,-0.5,0.5,2.4)
 )
 
 VTX_BINS = ONE_BIN.clone(
@@ -192,8 +192,8 @@ for (dr,de) in matches:
         if "avg" in scenario: setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
         if "_av1" in scenario: setattr(module.Efficiencies, "eff_1_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN1))
         if "tav1" in scenario: setattr(module.Efficiencies, "efft_1_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN1_TP))
-        if "_eta" in scenario: setattr(module.Efficiencies, "eff_eta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
         if "aeta" in scenario: setattr(module.Efficiencies, "eff_aeta_"+label, cms.PSet(common, BinnedVariables = AETA_BINS))
+        if "et1" in scenario: setattr(module.Efficiencies, "eff_eta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
         if "et2" in scenario: setattr(module.Efficiencies, "eff_eta2_"+label, cms.PSet(common, BinnedVariables = ETA2_BINS))
         if "et3" in scenario: setattr(module.Efficiencies, "eff_eta3_"+label, cms.PSet(common, BinnedVariables = ETA3_BINS))
         if "vtx" in scenario: setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))

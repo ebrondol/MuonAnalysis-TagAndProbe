@@ -92,6 +92,8 @@ process.TnP_Muon_Seed = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     SaveWorkspace = cms.bool(False),
 )
 
+if "TestData_" in scenario:
+    process.TnP_Muon_Seed.InputFileNames = [ "tnpZ_Data_%s.root" % ("_".join(scenario.replace("TestData_","").split("_")[:-1]),) ]
 if "TestMC_" in scenario:
     process.TnP_Muon_Seed.InputFileNames = [ "tnpZ_MC_%s.root" % ("_".join(scenario.replace("TestMC_","").split("_")[:-1]),) ]
 
