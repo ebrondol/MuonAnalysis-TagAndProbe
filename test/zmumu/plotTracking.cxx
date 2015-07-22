@@ -33,24 +33,24 @@ void plotTracking(TString scenario="data",bool DataVsMCcomparison = false, TStri
     doDiffPlot  = false;
     doPdf = true;
     doSquare = true; yMin = 0.949; yMax = 1.009;
-    doFillMC = true;
+    doFillMC = false;
     datalbl = "Data, 2015";
     reflbl  = "Simulation";
-    preliminary = "CMS Simulation, #sqrt{s} = 13 TeV";
+    cmslabel = "CMS Simulation, #sqrt{s} = 13 TeV";
 
     if (scenario.Contains("74X")) {
         datalbl = "74X Data";
         reflbl  = "53X Data";
         lineColorRef_FillMC = 100;
         fillColorRef_FillMC = 207;
-        preliminary = "Run2012D";
+        cmslabel = "Run2012D";
         prefix = "plots/";
     }
     if (scenario.Contains("_vs_")) {
         datalbl = "Modified";
         reflbl  = "Reference";
         prefix = "plots/"+scenario+"/";
-        yMin = 0.9;
+        //yMin = 0.9;
         if (scenario.Contains("_L1_vs_")) {
             basedir  = "tpTreeL1";
             basedir2 = "tpTreeL1";
@@ -66,10 +66,16 @@ void plotTracking(TString scenario="data",bool DataVsMCcomparison = false, TStri
             }
         }
         if (DataVsMCcomparison == true) {
+            cmslabel = "CMS Preliminary";
+	    cmsconditionslabel = "#sqrt{s} = 13 TeV, L = 22.09 pb^{-1}";
             datalbl = "Data, 2015";
             reflbl = "Simulation";
-            yMin = 0.9;
+            //yMin = 0.9;
         }
+	if (scenario.Contains("_vs_Early")){
+          datalbl = "generalTracks";
+          reflbl  = "earlyGeneralTracks";
+	}
 
     }
 
@@ -91,11 +97,11 @@ void plotTracking(TString scenario="data",bool DataVsMCcomparison = false, TStri
 
 void plotTracking_(TString match) {
     const int nplots = 13;
-    const char *plots[nplots] = { "eff_aeta",    "eff_1",    "efft_1",    "eff_eta",  "eff_eta2", "eff_eta3",  "eff",       "eff_vtx",             "eff_two", 	"eff_phi", 	"eff_eph", 	"eff_eph", 	"eff_eph"};
-    const char * vars[nplots] = { "abseta",      "eta",      "eta",       "eta",      "eta",      "eta",       "eta",       "tag_nVertices",       "abseta", 	"phi",		 "phi", 	"phi", 		"phi"};
-    const char *xvars[nplots] = { "muon |#eta|", "muon #eta","muon #eta", "muon #eta","muon #eta","muon #eta", "muon #eta", "N(primary vertices)", "muon |#eta|", "muon #phi" ,	"muon #phi", 	"muon #phi", 	"muon #phi"};
-    const char *bincs[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"",		"eta_bin0", 	"eta_bin1", 	"eta_bin2"}; 
-    const char *binls[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"", 		"#eta < -0.5", 	"-0.5 > #eta > 0.5", "#eta > 0.5"};
+    const char *plots[nplots] = { "eff_aeta",    "eff_1",    "efft_1",    "eff_eta",  "eff_eta2", "eff_eta3",  "eff",       "eff_vtx",             "eff_two", 	"eff_phi", 	"eff_eph", 	"eff_eph"};
+    const char * vars[nplots] = { "abseta",      "eta",      "eta",       "eta",      "eta",      "eta",       "eta",       "tag_nVertices",       "abseta", 	"phi",		 "phi", 	"phi"};
+    const char *xvars[nplots] = { "muon |#eta|", "muon #eta","muon #eta", "muon #eta","muon #eta","muon #eta", "muon #eta", "N(primary vertices)", "muon |#eta|", "muon #phi" ,	"muon #phi", 	"muon #phi"};
+    const char *bincs[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"",		"_eta_bin0", 	"_eta_bin1"}; 
+    const char *binls[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"", 		"", 	""};
     bool  has10files = (gNFiles == 10);
     bool  has9files = (gNFiles == 9);
     bool  has8files = (gNFiles >= 8);
@@ -119,15 +125,15 @@ void plotTracking_(TString match) {
             TDirectory *ref_1 = ref->GetDirectory(basedir2+"/"+plotname+"NoZ/");
             double yMin0 = yMin;; yMax = 1.009;
             retitle = "Raw efficiency";
-            if (fit_0 && ref_0) refstack(fit_0, ref_0, plotname+binName, varname+"_PLOT_"+binCut);
+            if (fit_0 && ref_0) refstack(fit_0, ref_0, plotname+binName, varname+"_PLOT"+binCut);
             retitle = "Fake rate";
             yMin = 0.0; yMax = 0.7;
-            if (fit_1 && ref_1) refstack(fit_1, ref_1, plotname+binName+"_fake", varname+"_PLOT_"+binCut);
+            if (fit_1 && ref_1) refstack(fit_1, ref_1, plotname+binName+"_fake", varname+"_PLOT"+binCut);
             yMin = yMin0;
             if (fit_0 && fit_1 && ref_0 && ref_1) {
                 yMin = yMin0; yMax = 1.003; retitle = "Efficiency";
-                TGraphAsymmErrors *corr = corrsingle(fit_0, fit_1, plotname+"_corr",     varname+"_PLOT_"+binCut, false);
-                TGraphAsymmErrors *cref = corrsingle(ref_0, ref_1, plotname+"_corr_ref", varname+"_PLOT_"+binCut, false);
+                TGraphAsymmErrors *corr = corrsingle(fit_0, fit_1, plotname+"_corr",     varname+"_PLOT"+binCut, false);
+                TGraphAsymmErrors *cref = corrsingle(ref_0, ref_1, plotname+"_corr_ref", varname+"_PLOT"+binCut, false);
                 if (doFillMC) {
                     cref->SetLineColor(lineColorRef_FillMC);
                     cref->SetFillColor(fillColorRef_FillMC);
@@ -180,8 +186,8 @@ void plotTracking_(TString match) {
                     if (!fit0_1) std::cout << "Missing fit0_1" << std::endl;
                     if (!ref0_0) std::cout << "Missing ref0_0" << std::endl;
                     if (!ref0_1) std::cout << "Missing ref0_1" << std::endl;
-                    TGraphAsymmErrors *corr0 = corrsingle(fit0_0, fit0_1, plotname0+"_corr0",     varname+"_PLOT_"+binCut, false);
-                    TGraphAsymmErrors *cref0 = corrsingle(ref0_0, ref0_1, plotname0+"_corr0_ref", varname+"_PLOT_"+binCut, false);
+                    TGraphAsymmErrors *corr0 = corrsingle(fit0_0, fit0_1, plotname0+"_corr0",     varname+"_PLOT"+binCut, false);
+                    TGraphAsymmErrors *cref0 = corrsingle(ref0_0, ref0_1, plotname0+"_corr0_ref", varname+"_PLOT"+binCut, false);
                     cref0->SetFillColor(kViolet-2);
                     cref0->SetLineStyle(0);
                     corr0->SetFillColor(kViolet+3);
@@ -213,7 +219,7 @@ void plotTracking_(TString match) {
                         TDirectory *fitS  = files[8]->GetDirectory("tpTree/"+plotnameS+"/");
                         TDirectory *fitSP = files[8]->GetDirectory("tpTree/"+plotnameSP+"/");
                         doRatioPlot = 1;
-                        if (fitS && fitSP) refstack(fitS, fitSP, plotnameS+binName, varname+"_PLOT_"+binCut);
+                        if (fitS && fitSP) refstack(fitS, fitSP, plotnameS+binName, varname+"_PLOT"+binCut);
                         reflbl = bk_reflbl; datalbl = bk_datalbl;
                         TString corrName = "ref_"+plotnameS+binName;
                         if (*(plots[i]+3) == 't') corrName = "fit_"+plotnameS+binName;
@@ -245,14 +251,14 @@ void plotTracking_(TString match) {
                         TDirectory *refS  = files[9]->GetDirectory("tpTree/"+plotnameS+"/");
                         TDirectory *refSP = files[9]->GetDirectory("tpTree/"+plotnameSP+"/");
                         retitle = "OITK Seed Efficiency";
-                        if (fitS  && refS)  refstack(fitS,  refS,  plotnameS +binName, varname+"_PLOT_"+binCut);
+                        if (fitS  && refS)  refstack(fitS,  refS,  plotnameS +binName, varname+"_PLOT"+binCut);
                         retitle = "OITK Probe Efficiency";
-                        if (fitSP && refSP) refstack(fitSP, refSP, plotnameSP+binName, varname+"_PLOT_"+binCut);
+                        if (fitSP && refSP) refstack(fitSP, refSP, plotnameSP+binName, varname+"_PLOT"+binCut);
                         TString bk_datalbl = datalbl, bk_reflbl = reflbl;
                         datalbl = "Tk Probe"; reflbl = "Tk & Sta";
                         doRatioPlot = 1;
-                        if (fitS && fitSP) refstack(fitS, fitSP, plotnameS+binName+"_fit", varname+"_PLOT_"+binCut);
-                        if (refS && refSP) refstack(refS, refSP, plotnameS+binName+"_ref", varname+"_PLOT_"+binCut);
+                        if (fitS && fitSP) refstack(fitS, fitSP, plotnameS+binName+"_fit", varname+"_PLOT"+binCut);
+                        if (refS && refSP) refstack(refS, refSP, plotnameS+binName+"_ref", varname+"_PLOT"+binCut);
                         reflbl = bk_reflbl; datalbl = bk_datalbl;
                         TGraphAsymmErrors *fitRSP = (TGraphAsymmErrors *) fOut->Get("ratio_"+plotnameS+binName+"_fit");
                         TGraphAsymmErrors *refRSP = (TGraphAsymmErrors *) fOut->Get("ratio_"+plotnameS+binName+"_ref");
@@ -275,7 +281,7 @@ void plotTracking_(TString match) {
                         crefBC->GetYaxis()->SetTitle("Bias-corrected eff.");
                         crefBC->Draw(doFillMC ? "AE2" : "AP");
                         corrBC->Draw("P SAME");
-                        //if (datalbl) doLegend(corrBC,crefBC,datalbl,reflbl);
+                        if (datalbl) doLegend(corrBC,crefBC,datalbl,reflbl);
                         c1->Print(prefix+plotname+binName+"_biascorr"+".png"); 
                         if (doPdf) c1->Print(prefix+plotname+binName+"_biascorr"+".pdf");
                         if (doTxt)  printGraph(corrBC,"fit_"+plotname+binName+"_biascorr");
@@ -292,11 +298,11 @@ void plotTracking_(TString match) {
                 //extraSpam = "  1.2 < |#eta| < 2.4"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             } else {
                 yMin = 0.9; yMax = 1.019; retitle = "Raw efficiency";
-                if (fit_0) single(fit_0, plotname, varname+"_PLOT_"+binCut);
+                if (fit_0) single(fit_0, plotname, varname+"_PLOT"+binCut);
                 yMin = 0.0; yMax = 1.1;  retitle = "Fake rate";
-                if (fit_1) single(fit_1, plotname+"_fake1", varname+"_PLOT_"+binCut);
+                if (fit_1) single(fit_1, plotname+"_fake1", varname+"_PLOT"+binCut);
                 yMin = 0.9; yMax = 1.019; retitle = "Efficiency";
-                if (fit_0 && fit_1) corrsingle(fit_0, fit_1, plotname+"_corr", varname+"_PLOT_"+binCut);
+                if (fit_0 && fit_1) corrsingle(fit_0, fit_1, plotname+"_corr", varname+"_PLOT"+binCut);
             }
         }
 
@@ -359,7 +365,8 @@ TGraphAsymmErrors* corrsingle(TDirectory *fit, TDirectory *fake, TString alias, 
     if (retitle != "") out->GetYaxis()->SetTitle(retitle);
     
     if (doSquare) squareCanvas(c1);
-    if (preliminary != "") cmsprelim();
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
 
     if (print) {
         c1->Print(prefix+alias+".png");

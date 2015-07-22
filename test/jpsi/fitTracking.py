@@ -9,6 +9,7 @@ print "Will run scenario ", scenario
 doEta = False
 doIchep = True
 doVtx = False
+allMatches = True
 
 CONSTRAINTS = cms.PSet(
     outerValidHits = cms.vstring("pass"),
@@ -49,7 +50,8 @@ ETA_PHI_BINS = cms.PSet(CONSTRAINTS,
 )
 
 VTX_BINS = ONE_BIN.clone(
-    tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5)
+    tag_nVertices = cms.vdouble(*[2*i+0.5 for i in xrange(15)])
+#    tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5,8.5,9.5,10.5)
 )
 
 PHI_BINS = ONE_BIN.clone(
@@ -131,7 +133,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 matches = [ (0.3,0.15) ]
 effs    = [ "", "_NoJPsi", "_NoBestJPsi" ]
 tracks  = [ "tk", "tk0" ]
-if True:
+if allMatches:
     matches = [ (1.0,0.4), (0.7,0.3), (0.5,0.2), (0.3,0.15), (0.1,0.1) ]
 
 process.TnP_Tracking = Template.clone(
