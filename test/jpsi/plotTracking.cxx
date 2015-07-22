@@ -94,7 +94,7 @@ void plotTracking(TString scenario="data",bool DataVsMCcomparison = false, TStri
 void plotTracking_(TString match) {
     const int nplots = 13;
     const char *plots[nplots] = { "eff_abseta",    "eff_1",    "efft_1",    "eff_eta",  "eff_eta2", "eff_eta3",  "eff",       "eff_vtx",             "eff_two", 	"eff_phi", 	"eff_eph", 	"eff_eph", 	"eff_eph"};
-    const char * vars[nplots] = { "abseta",      "eta",      "eta",       "eta",      "eta",      "eta",       "eta",       "tag_nVertices",       "abseta", 	"phi",	 "etaphi", 	"etaphi", 		"etaphi"};
+    const char * vars[nplots] = { "abseta",      "eta",      "eta",       "eta",      "eta",      "eta",       "eta",       "tag_nVertices",       "abseta", 	"phi",	 "phi", 	"phi", 		"phi"};
     const char *xvars[nplots] = { "muon |#eta|", "muon #eta","muon #eta", "muon #eta","muon #eta","muon #eta", "muon #eta", "N(primary vertices)", "muon |#eta|", "muon #phi",	"muon #phi", 	"muon #phi", 	"muon #phi"};
     const char *bincs[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"",		"eta_bin0", 	"eta_bin1", 	"eta_bin2"}; 
     const char *binls[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"", 		"#eta < -0.5", 	"-0.5 > #eta > 0.5", "#eta > 0.5"};
