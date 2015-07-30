@@ -11,6 +11,7 @@ TString basedir2 = "tpTree";
 TFile *files[10]; int gNFiles = 0;
 void plotTracking_(TString match) ;
 TGraphAsymmErrors* corrsingle(TDirectory *fit, TDirectory *fake, TString alias, TString fitname, bool print=true) ;
+TGraphAsymmErrors* corrsingle2(TDirectory *fit, TDirectory *fake, TDirectory *fake2, TString alias, TString fitname, bool print=true) ;
 TGraphAsymmErrors* biasCorrection(TGraphAsymmErrors *fit0, TGraphAsymmErrors *fit1, TGraphAsymmErrors *ratioSP) ;
 
 void plotTracking(TString scenario="data",bool DataVsMCcomparison = false, TString match="dr030e030") {
@@ -101,39 +102,79 @@ void plotTracking_(TString match) {
     bool  has10files = (gNFiles == 10);
     bool  has9files = (gNFiles == 9);
     bool  has8files = (gNFiles >= 8);
+    bool  has6files = (gNFiles == 6);
     bool  has4files = (gNFiles == 4) || has8files;
 std::cout << "start plotTracking with " << gNFiles << " files." << std::endl;
     TFile *ref = (TFile *) gROOT->GetListOfFiles()->At(1); 
     for (size_t i = 0; i < nplots; ++i) {
+
         retitleX = TString(xvars[i]);
         TString plotName(plots[i]); plotName += "_"+match;
         TString varname(vars[i]);
-        TString binCut(bincs[i]); TString binName = (binCut != "" ? binCut : binCut);
+        TString binCut(bincs[i]); 
+	TString binName = (binCut != "" ? binCut : binCut);
         extraSpam = TString(binls[i]);
-        if (has4files) files[0]->cd();
-        TDirectory *fit_0 = gFile->GetDirectory(basedir+"/"+plotName+"/");
+	TDirectory *fit_0, *fit_1, *fit_2;
+	
+        if (has4files || has6files) files[0]->cd();
+        fit_0 = gFile->GetDirectory(basedir+"/"+plotName+"/");
         if (fit_0 == 0) { 
 	  std::cerr << "Didn't find " << basedir+"/"+plotName+"/" << " in " << gFile->GetName() << std::endl; 
 	  continue; 
  	}
-        if (has4files) files[1]->cd();
-        TDirectory *fit_1 = gFile->GetDirectory(basedir+"/"+plotName+"NoJPsi/");
-        if (ref != 0 || has4files || has8files) {
-            if (has4files) ref = files[2];
-            TDirectory *ref_0 = ref->GetDirectory(basedir2+"/"+plotName+"/");
-            if (has4files) ref = files[3];
-            TDirectory *ref_1 = ref->GetDirectory(basedir2+"/"+plotName+"NoJPsi/");
+
+        if (has4files || has6files) files[1]->cd();
+        fit_1 = gFile->GetDirectory(basedir+"/"+plotName+"NoJPsi/");
+        if (fit_1 == 0) {
+          std::cerr << "Didn't find " << basedir+"/"+plotName+"/" << " in " << gFile->GetName() << std::endl;
+          continue;
+        }
+
+	if (has6files) {
+          files[2]->cd();
+          fit_2 = gFile->GetDirectory(basedir+"/"+plotName+"NoBestJPsi/");
+          if (fit_2 == 0) {
+            std::cerr << "Didn't find " << basedir+"/"+plotName+"/" << " in " << gFile->GetName() << std::endl;
+            continue;
+          }
+        }
+
+ 	if (ref != 0 || has4files || has6files || has8files) {
+std::cout << "here.." << std::endl;
+
+            //definition of reference files
+            TDirectory *ref_0, *ref_1, *ref_2;
+            if (has4files) files[2]->cd();//ref = files[2];
+            if (has6files) files[3]->cd();//ref = files[3];
+            ref_0 = gFile->GetDirectory(basedir2+"/"+plotName+"/");
+            if (has4files) files[3]->cd();//ref = files[3];
+            if (has6files) files[4]->cd();//ref = files[4];
+            ref_1 = gFile->GetDirectory(basedir2+"/"+plotName+"NoJPsi/");
+            if (has6files) files[5]->cd();//ref = files[4];
+            ref_2 = gFile->GetDirectory(basedir2+"/"+plotName+"NoBestJPsi/");
+
+            //refstack for eff and fake
             double yMin0 = yMin;; yMax = 1.009;
             retitle = "Raw efficiency";
             if (fit_0 && ref_0) refstack(fit_0, ref_0, plotName+binName, varname+"_PLOT_"+binCut);
             retitle = "Fake rate";
-            yMin = 0.0; yMax = 0.7;
-            if (fit_1 && ref_1) refstack(fit_1, ref_1, plotName+binName+"_fake", varname+"_PLOT_"+binCut);
+            yMin = 0.0; yMax = 1.1;
+            if (fit_1 && ref_1) refstack(fit_1, ref_1, plotName+binName+"_fake1", varname+"_PLOT_"+binCut);
+            if (fit_2 && ref_2) refstack(fit_2, ref_2, plotName+binName+"_fake2", varname+"_PLOT_"+binCut);
             yMin = yMin0;
+
             if (fit_0 && fit_1 && ref_0 && ref_1) {
+std::cout << "Filling graphs 0&1.." << std::endl;
                 yMin = yMin0; yMax = 1.003; retitle = "Efficiency";
-                TGraphAsymmErrors *corr = corrsingle(fit_0, fit_1, plotName+"_corr",     varname+"_PLOT_"+binCut, false);
-                TGraphAsymmErrors *cref = corrsingle(ref_0, ref_1, plotName+"_corr_ref", varname+"_PLOT_"+binCut, false);
+                TGraphAsymmErrors *corr, *cref;
+                if(has4files){
+   		  corr = corrsingle(fit_0, fit_1, plotName+"_corr",     varname+"_PLOT_"+binCut, false);
+                  cref = corrsingle(ref_0, ref_1, plotName+"_corr_ref", varname+"_PLOT_"+binCut, false);
+                } else if ( fit_2 && ref_2 && has6files ){
+std::cout << "Filling graphs 2.." << std::endl;
+   		  corr = corrsingle2(fit_0, fit_1, fit_2, plotName+"_corr",     varname+"_PLOT_"+binCut, false);
+                  cref = corrsingle2(ref_0, ref_1, ref_2, plotName+"_corr_ref", varname+"_PLOT_"+binCut, false);
+		}
                 if (doFillMC) {
                     cref->SetLineColor(lineColorRef_FillMC);
                     cref->SetFillColor(fillColorRef_FillMC);
@@ -301,14 +342,18 @@ std::cout << "start plotTracking with " << gNFiles << " files." << std::endl;
                 if (fit_0) single(fit_0, plotName, varname+"_PLOT_"+binCut);
                 yMin = 0.0; yMax = 1.1;  retitle = "Fake rate";
                 if (fit_1) single(fit_1, plotName+"_fake1", varname+"_PLOT_"+binCut);
+                if (fit_2) single(fit_2, plotName+"_fake2", varname+"_PLOT_"+binCut);
                 yMin = 0.9; yMax = 1.019; retitle = "Efficiency";
-                if (fit_0 && fit_1) corrsingle(fit_0, fit_1, plotName+"_corr", varname+"_PLOT_"+binCut);
+                if (fit_0 && fit_1) corrsingle(fit_0, fit_1, plotName+"_corr1", varname+"_PLOT_"+binCut);
+	        if (fit_0 && fit_2) corrsingle(fit_0, fit_2, plotname+"_corr2", varname+"_PLOT_");
+		if (fit_0 && fit_1 && fit_2) corrsingle2(fit_0, fit_1, fit_2, plotname+"_corr", varname+"_PLOT_");
             }
         }
 
         if (0 && ref == 0) {
             if (fit_0) doCanvas(fit_0, 1, 50, plotName+"_"+varname+"_%d", varname+"_bin%d__");
-            if (fit_1) doCanvas(fit_1, 1, 50, plotName+"_fake_"+varname+"_%d", varname+"_bin%d__");
+            if (fit_1) doCanvas(fit_1, 1, 50, plotName+"_fake1_"+varname+"_%d", varname+"_bin%d__");
+            if (fit_2) doCanvas(fit_2, 1, 50, plotname+"_fake2_"+varname+"_%d", varname+"_bin%d__");
         }
     }
 }
@@ -364,6 +409,78 @@ TGraphAsymmErrors* corrsingle(TDirectory *fit, TDirectory *fake, TString alias, 
     out->GetYaxis()->SetTitleOffset(1.3);
     if (retitle != "") out->GetYaxis()->SetTitle(retitle);
     
+    if (doSquare) squareCanvas(c1);
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
+
+    if (print) {
+        c1->Print(prefix+alias+".png");
+        if (doPdf) c1->Print(prefix+alias+".pdf");
+    }
+
+    return out;
+}
+
+TGraphAsymmErrors* corrsingle2(TDirectory *fit, TDirectory *fake, TDirectory *fake2, TString alias, TString fitname, bool print=true) {
+    if (fake == 0 || fake2 == 0 || fit == 0) return 0;
+    
+    TCanvas *pfake = (TCanvas*) getFromPrefix(fake->GetDirectory("fit_eff_plots"), fitname);
+    if (pfake == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fake->GetName() << std::endl;
+        return 0;
+    }
+    RooHist *hfake = (RooHist *) pfake->FindObject("hxy_fit_eff");
+
+    TCanvas *pfake2 = (TCanvas*) getFromPrefix(fake2->GetDirectory("fit_eff_plots"), fitname);
+    if (pfake2 == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fake2->GetName() << std::endl;
+        return 0;
+    }
+    RooHist *hfake2 = (RooHist *) pfake2->FindObject("hxy_fit_eff");
+
+    TCanvas *pfit = (TCanvas*) getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    if (pfit == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
+        return 0;
+    }
+    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+
+    TGraphAsymmErrors *out = new TGraphAsymmErrors();
+    for (int i = 0, n = hfit->GetN(), k = 0; i < n; ++i) {
+        double x = hfit->GetX()[i], y = hfit->GetY()[i], eyh = hfit->GetErrorYhigh(i), eyl = hfit->GetErrorYlow(i);
+        int j = findBin(hfake, x); if (j == -1) continue;
+        double yf1  = hfake->GetY()[j], eyhf1 = hfake->GetErrorYhigh(j), eylf1 = hfake->GetErrorYlow(j);
+        int j2 = findBin(hfake2, x); if (j2 == -1) continue;
+        double yf2  = hfake2->GetY()[j2], eyhf2 = hfake2->GetErrorYhigh(j2), eylf2 = hfake2->GetErrorYlow(j2);
+        double yf = 0.5*(yf1+yf2);
+        double ylf = TMath::Min(yf1-eylf1, yf2-eylf2);
+        double yhf = TMath::Max(yf1+eylf1, yf2+eylf2);
+        double ycorr =    (   y   -yf )/(1-yf );
+        double ycorr_hi = ((y+eyh)-ylf)/(1-ylf);
+        double ycorr_lo = ((y-eyl)-yhf)/(1-yhf);
+
+        out->Set(k+1);
+        out->SetPoint(k, x, ycorr);
+        out->SetPointError(k, hfit->GetErrorXlow(i), hfit->GetErrorXhigh(i), ycorr - ycorr_lo, ycorr_hi - ycorr );
+        k++;
+    }
+
+    c1->Clear(); c1->cd();
+    c1->SetLeftMargin(0.16);
+    out->SetLineWidth(2);
+    out->SetLineColor(kBlack);
+    out->SetMarkerColor(kBlack);
+    out->SetMarkerStyle(20);
+    out->SetMarkerSize(1.6);
+    out->Draw("AP");
+    out->GetXaxis()->SetTitle(getXtitle(pfit));
+    out->GetXaxis()->SetMoreLogLabels(1);
+    out->GetXaxis()->SetRangeUser(out->GetX()[0]-out->GetErrorXlow(0), out->GetX()[out->GetN()-1]+out->GetErrorXhigh(out->GetN()-1));
+    out->GetYaxis()->SetRangeUser(yMin, yMax);
+    out->GetYaxis()->SetDecimals(true);
+    out->GetYaxis()->SetTitleOffset(1.3);
+    if (retitle != "") out->GetYaxis()->SetTitle(retitle);
+
     if (doSquare) squareCanvas(c1);
     if (cmslabel != "") printcmsprelim();
     if (cmsconditionslabel != "") printcmsconditionslabel();
